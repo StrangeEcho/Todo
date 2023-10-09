@@ -1,6 +1,6 @@
 from discord.ext import commands
 from discord import app_commands
-from core.todo import TodoBot
+from core.bot import TodoBot
 
 import discord
 
@@ -12,12 +12,19 @@ class Meta(commands.Cog):
             "✅"
         }
     
+    async def cog_load(self):
+        self.bot.tree.on_error = self.on_app_command_error
+
+    async def on_app_command_error(self, inter: discord.Interaction, error: app_commands.AppCommandError):
+        await inter.response.send_message(f"{inter.command.name} errored out.\n {error}")
+
+
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.Member):
         """Listen for the reactions and perform tasks accordingly"""
         msg = reaction.message
-        if msg.guild.id != self.bot.todo_channel or msg.author.id != self.bot.user.id:
-            return
+        if user.bot or msg.channel.id != self.bot.todo_channel:
+            return 
         emb = msg.embeds[0]
         if reaction.emoji == "👷":
             emb.color = discord.Color.yellow()
@@ -42,17 +49,21 @@ class Meta(commands.Cog):
     )
     async def todo(self, inter: discord.Interaction, *, task: str):
         """Add a task to the todo list"""
+        await inter.response.defer()
         channel = self.bot.get_channel(self.bot.todo_channel)
         msg  = await channel.send(
             embed=discord.Embed(
                 title="New Task",
-                description=task,
+                description=f"```\n{task}\n```",
                 color=discord.Color.red()
+            ).set_author(
+                name=f"Task proposed by: {inter.user}",
+                url=inter.user.display_avatar.url
             )
         )
         for reaction in self.reactions:
             await msg.add_reaction(reaction)
-    
+        await inter.followup.send(f"Finished adding task to Todolist")
 async def setup(bot: TodoBot):
     await bot.add_cog(Meta(bot))
 
