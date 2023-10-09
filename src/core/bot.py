@@ -21,7 +21,7 @@ class TodoBot(commands.AutoShardedBot):
         self.owner_ids: set[int] = self.config.get("owner_ids")
     
     async def start(self) -> None:
-        self.logger.info("Performing TodoBot startup...")
+        self.logger.info(f"Starting TodoBot(PID {os.getpid()})...")
         await self._load_extensions()
         await super().start(self.config.get("token"))
     
