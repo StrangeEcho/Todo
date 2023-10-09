@@ -51,6 +51,8 @@ class Meta(commands.Cog):
         """Add a task to the todo list"""
         await inter.response.defer()
         channel = self.bot.get_channel(self.bot.todo_channel)
+        if not channel:
+            return await inter.response.send_message("No TODO channel set")
         msg  = await channel.send(
             embed=discord.Embed(
                 title="New Task",
@@ -58,12 +60,13 @@ class Meta(commands.Cog):
                 color=discord.Color.red()
             ).set_author(
                 name=f"Task proposed by: {inter.user}",
+            ).set_thumbnail(
                 url=inter.user.display_avatar.url
             )
         )
         for reaction in self.reactions:
             await msg.add_reaction(reaction)
-        await inter.followup.send(f"Finished adding task to Todolist")
+        await inter.followup.send(f"Finished adding task to Todolist", ephemeral=True)
 async def setup(bot: TodoBot):
     await bot.add_cog(Meta(bot))
 

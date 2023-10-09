@@ -33,6 +33,9 @@ class TodoBot(commands.AutoShardedBot):
         """General Error handler"""
         self.logger.exception(f"Unhandled exception in {event}.")
     
+    async def on_command_error(self, ctx: commands.Context, exception: commands.CommandError):
+        """General Error handler for commands framework"""
+        await ctx.send(f"Unhandled Exception Caught:\n{exception}")
     async def _load_extensions(self):
         """Helper to load all cogs/extension found in the cogs file"""
         self.logger.info("Attempting to load cog extensions")
