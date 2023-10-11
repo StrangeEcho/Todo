@@ -19,7 +19,7 @@ class TodoBot(commands.AutoShardedBot):
         )
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.config = ConfigHandler()
-        self.todo_channel: Final[int] = self.config.get("todo_channel")
+        self.todo_channel: int = self.config.get("todo_channel")
         self.owner_ids: set[int] = self.config.get("owner_ids")
 
     async def start(self) -> None:
