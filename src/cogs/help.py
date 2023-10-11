@@ -1,11 +1,12 @@
+import typing
 from typing import Any, List, Mapping, Optional
+
+import discord
 from discord.ext import commands
 from discord.ext.commands.cog import Cog
 from discord.ext.commands.core import Command
-from core.bot import TodoBot
 
-import typing
-import discord
+from core.bot import TodoBot
 
 
 class TodoHelpCommand(commands.HelpCommand):
@@ -20,8 +21,13 @@ class TodoHelpCommand(commands.HelpCommand):
                 description=f"{self.context.bot.user.name} is a task management bot created for the ModernRoleplay development/revival\n\n"
                 "**Prefix**: "
                 f"`!` or {self.context.bot.user.mention}\n\n"
-                f"**Current Modules**:\n" + 
-                "\n".join([f"`{cog.qualified_name}`" for cog in self.context.bot.cogs.values()]),
+                f"**Current Modules**:\n"
+                + "\n".join(
+                    [
+                        f"`{cog.qualified_name}`"
+                        for cog in self.context.bot.cogs.values()
+                    ]
+                ),
                 color=discord.Color.blue(),
             )
             .set_thumbnail(url=self.context.bot.user.avatar.url)
