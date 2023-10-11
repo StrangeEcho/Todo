@@ -54,7 +54,7 @@ class Meta(commands.Cog):
             return await inter.response.send_message("No TODO channel set")
         msg = await channel.send(
             embed=discord.Embed(
-                title="New Task",
+                title="New Task!",
                 description=f"```\n{task}\n```",
                 color=discord.Color.red(),
             )
