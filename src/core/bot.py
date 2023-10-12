@@ -68,4 +68,4 @@ class TodoBot(commands.AutoShardedBot):
                     await self.load_extension(cog)
                     _logger.info("success...")
                 except commands.ExtensionError as e:
-                    _logger.error(f"failed...\n\n{e}")
+                    _logger.error(f"failed... | {e}")

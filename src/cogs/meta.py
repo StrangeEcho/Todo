@@ -37,6 +37,27 @@ class Meta(commands.Cog):
             emb.color = discord.Color.green()
             emb.title="Task completed!"
             await msg.edit(embed=emb)
+    
+    @commands.command()
+    async def ping(self, ctx: commands.Context):
+        """Retrieves latency information on HTTP and WebSocket connection to Gateway"""
+        msg = await ctx.send("Measuring now...")
+        edit_latency = round(
+            (msg.created_at - ctx.message.created_at).total_seconds() * 1000
+        )
+        await ctx.send(
+            embed=discord.Embed(
+                title="Measured Out Latency",
+                color=discord.Color.blue()
+            ).add_field(
+                name="Websocket/Gateway",
+                value="\n".join([f"`Shard ID: {shard_id} | {round(latency * 1000)}ms`" for shard_id, latency in self.bot.latencies])
+            ).add_field(
+                name="HTTP",
+                value=f"`{edit_latency}ms`",
+                inline=False
+            )
+        )
 
     @app_commands.command()
     @app_commands.describe(task="The task to be added to the todo list")
