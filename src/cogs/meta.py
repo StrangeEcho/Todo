@@ -63,6 +63,12 @@ class Meta(commands.Cog):
             )
         )
         await msg.delete()
+    
+    @commands.command() 
+    async def cleanup(self, ctx: commands.Context, limit: int = 15):
+        """Cleanup the bots messages"""
+        msgs = await ctx.channel.purge(limit=limit, check=lambda x: x.author.id == self.bot.user.id)
+        await ctx.send(f"Cleaned up {len(msgs)} of my messages")
 
     @app_commands.command()
     @app_commands.describe(task="The task to be added to the todo list")
