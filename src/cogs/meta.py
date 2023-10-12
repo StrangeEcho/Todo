@@ -8,7 +8,7 @@ from core.bot import TodoBot
 class Meta(commands.Cog):
     def __init__(self, bot: TodoBot):
         self.bot = bot
-        self.reactions: set[str] = {"👷", "✅"}
+        self.reactions: set[str] = {"👷", "✅", "❌"}
 
     async def cog_load(self) -> None:
         self.bot.tree.on_error = self.on_app_command_error
@@ -37,6 +37,10 @@ class Meta(commands.Cog):
             emb.color = discord.Color.green()
             emb.title="Task completed!"
             await msg.edit(embed=emb)
+        if reaction.emoji == "❌":
+            emb.title = "Task Rejected"
+            await msg.edit(embed=emb.set_footer(text=f"Task rejected by {user}"))
+
     
     @commands.command(aliases=["latency"])
     async def ping(self, ctx: commands.Context):
@@ -78,6 +82,9 @@ class Meta(commands.Cog):
                 name=f"Task proposed by: {inter.user}",
             )
             .set_thumbnail(url=inter.user.display_avatar.url)
+            .set_footer(
+                text="❌ Decline | 👷 Claim | ✅ Mark Finished"
+            )
         )
         for reaction in self.reactions:
             await msg.add_reaction(reaction)
