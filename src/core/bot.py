@@ -1,10 +1,11 @@
-from discord.ext import commands
-from .confighandler import ConfigHandler
-from typing import Final
+import logging
+import os
+from traceback import format_exception
 
 import discord
-import os
-import logging
+from discord.ext import commands
+
+from .confighandler import ConfigHandler
 
 
 class TodoBot(commands.AutoShardedBot):
@@ -18,7 +19,7 @@ class TodoBot(commands.AutoShardedBot):
         )
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.config = ConfigHandler()
-        self.todo_channel: Final[int] = self.config.get("todo_channel")
+        self.todo_channel: int = self.config.get("todo_channel")
         self.owner_ids: set[int] = self.config.get("owner_ids")
 
     async def start(self) -> None:
@@ -35,10 +36,26 @@ class TodoBot(commands.AutoShardedBot):
         self.logger.exception(f"Unhandled exception in {event}.")
 
     async def on_command_error(
-        self, ctx: commands.Context, exception: commands.CommandError
+        self, ctx: commands.Context, error: commands.CommandError
     ) -> None:
         """General Error handler for commands framework"""
-        await ctx.send(f"Unhandled Exception Caught:\n{exception}")
+        if isinstance(error, commands.CommandNotFound):
+            return
+        if isinstance(error, commands.CommandInvokeError):
+            logging.getLogger(ctx.command.cog_name).error(
+                "".join(format_exception(error))
+            )
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Unhandled Exception Thrown",
+                    description=f"```\n{error}\n```",
+                    color=discord.Color.red(),
+                ).set_footer(text="Check logs for full traceback")
+            )
+            return
+        await ctx.send(
+            embed=discord.Embed(description=error, color=discord.Color.red())
+        )
 
     async def _load_extensions(self) -> None:
         """Helper to load all cogs/extension found in the cogs file"""

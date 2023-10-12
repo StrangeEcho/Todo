@@ -1,8 +1,8 @@
-from discord.ext import commands
-from discord import app_commands
-from core.bot import TodoBot
-
 import discord
+from discord import app_commands
+from discord.ext import commands
+
+from core.bot import TodoBot
 
 
 class Meta(commands.Cog):
