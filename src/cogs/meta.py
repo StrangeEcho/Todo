@@ -38,7 +38,7 @@ class Meta(commands.Cog):
             emb.title="Task completed!"
             await msg.edit(embed=emb)
     
-    @commands.command()
+    @commands.command(aliases=["latency"])
     async def ping(self, ctx: commands.Context):
         """Retrieves latency information on HTTP and WebSocket connection to Gateway"""
         msg = await ctx.send("Measuring now...")
@@ -53,11 +53,12 @@ class Meta(commands.Cog):
                 name="Websocket/Gateway",
                 value="\n".join([f"`Shard ID: {shard_id} | {round(latency * 1000)}ms`" for shard_id, latency in self.bot.latencies])
             ).add_field(
-                name="HTTP",
+                name="HTTP Protocol",
                 value=f"`{edit_latency}ms`",
                 inline=False
             )
         )
+        await msg.delete()
 
     @app_commands.command()
     @app_commands.describe(task="The task to be added to the todo list")
