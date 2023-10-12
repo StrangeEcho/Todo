@@ -31,18 +31,12 @@ class Meta(commands.Cog):
         emb = msg.embeds[0]
         if reaction.emoji == "👷":
             emb.color = discord.Color.yellow()
-            await msg.edit(
-                embed=emb.set_footer(
-                    icon_url=user.display_avatar.url, text=f"Claimed by {user}"
-                )
-            )
+            emb.title = f"Task is being worked on by: {user}!"
+            await msg.edit(embed=emb)
         if reaction.emoji == "✅":
             emb.color = discord.Color.green()
-            await msg.edit(
-                embed=emb.set_footer(
-                    icon_url=user.display_avatar.url, text=f"Task Completed by {user}"
-                )
-            )
+            emb.title="Task completed!"
+            await msg.edit(embed=emb)
 
     @app_commands.command()
     @app_commands.describe(task="The task to be added to the todo list")
@@ -51,7 +45,7 @@ class Meta(commands.Cog):
         await inter.response.defer()
         channel = self.bot.get_channel(self.bot.todo_channel)
         if not channel:
-            return await inter.response.send_message("No TODO channel set")
+            return await inter.followup.send("No TODO channel set")
         msg = await channel.send(
             embed=discord.Embed(
                 title="New Task!",
@@ -67,6 +61,22 @@ class Meta(commands.Cog):
             await msg.add_reaction(reaction)
         await inter.followup.send(f"Finished adding task to Todolist", ephemeral=True)
 
+    @app_commands.command()
+    @app_commands.describe(
+        task_id = "The ID of the message the task is one",
+        revision = "The revised task to replace the old one"
+    )
+    async def taskrevise(self, inter: discord.Interaction, task_id: str, *, revision: str):
+        """Revise an open task"""
+        await inter.response.defer()
+        chan = inter.guild.get_channel(self.bot.todo_channel)
+        task = await chan.fetch_message(int(task_id))
+        if task.author.id != self.bot.user.id:
+            return await inter.followup.send(f"Task ID invalid")
+        emb = task.embeds[0]
+        emb.description = revision
+        await task.edit(embed=emb.set_footer(text="Task revised..."))
+        await inter.followup.send(f"Finished revising task")
 
 async def setup(bot: TodoBot) -> None:
     await bot.add_cog(Meta(bot))
