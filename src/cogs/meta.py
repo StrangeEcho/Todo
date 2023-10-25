@@ -20,7 +20,7 @@ class TaskModal(Modal):
         )
         self._todo_channel = channel
         self._reactions = {"👷", "✅", "❌"}
-        self.add_item(self.task_title)
+        self.add_item(self.task)
 
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.defer()
